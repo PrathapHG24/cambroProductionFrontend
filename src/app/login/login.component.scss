@@ -1,0 +1,27 @@
+.mat-raised-button[color="primary"] {  /* Target login button by color */
+    background-color: #4d7d43; /* Brand color */
+    color: #fff;
+    border: none;
+  
+    &:hover {
+      background-color: #305f2e; /* Darken on hover */
+    }
+  }
+  .mat-raised-button[color="accent"] {  /* Target login button by color */
+    background-color: #ebe838; /* Brand color */
+    color: #131313;
+    border: none;
+  
+    &:hover {
+      background-color: #305f2e; /* Darken on hover */
+    }
+  }
+    
+  .full-width {
+    width: 100%;
+  }
+  
+  .mat-input-element {
+    height: 30px;
+  }
+  

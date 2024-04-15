@@ -1,0 +1,34 @@
+<div class="container-xl">
+    <div class="table-responsive">
+        <div class="table-wrapper">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h4><b>New table</b></h4>
+                    </div>
+                    <div class="col-sm-6">
+                        <a href="#" routerLink="/Home" class="btn btn-success back"><i
+                                class='fas fa-arrow-circle-left'></i>
+                            &nbsp;Back</a>
+                    </div>
+                </div>
+            </div>
+            <form action="" [formGroup]="tableForm">
+                <div class="table-content">
+                    <div class="form-group p-10 row">
+                        <div class="col-sm-3">
+                            <label class="p-t-b-10">Table name<span class="requiredStar">*</span></label>
+                        </div>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" required maxlength="255" formControlName="tableName"
+                                name="tableName">
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="table-footer" style="display: flex; justify-content: flex-end;">
+                <button class="btn btn-success" (click)="opennConnectModal()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
