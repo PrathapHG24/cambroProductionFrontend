@@ -160,6 +160,7 @@ export class HomeComponent implements OnInit {
   }
   getSchedulerData() {
     this.jsonService.getJsondata(this.schedulerId).subscribe((data) => {
+      this.jsonService.hideLogoutBtn = true;
       this.importJSONDATA(data[0]);
       this.jsonData = data;
       this.objectVar = this.schedulerId;
@@ -199,6 +200,7 @@ export class HomeComponent implements OnInit {
 
   onCloseBatch() {
     this.updateEndTime();
+    this.jsonService.hideLogoutBtn = false;
   }
 
   updateEndTime() {
@@ -467,8 +469,8 @@ export class HomeComponent implements OnInit {
         })
         this.httpProvider.insertDataToPlc([payload]).subscribe(
             (res: any) => {
-                this.toastr.success('Data inserted to Plc');
-                this.toastr.success(res.data);
+                // this.toastr.success('Data inserted to Plc');
+                this.toastr.success(res.message);
             },
         (error: any) => {}
         );

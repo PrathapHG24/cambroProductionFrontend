@@ -25,14 +25,30 @@
   }
 </style>
 
-<nav class="navbar fixed-top navbar-expand-md navbar-light white double-nav scrolling-navbar">
+<nav
+  class="navbar fixed-top navbar-expand-md navbar-light white double-nav scrolling-navbar"
+>
   <div class="toolbar" role="banner">
     <div class="col-sm-9">
-      <h4><i class='fas fa-home' (click)="HomeClick()"></i></h4>
+      <h4>
+        <i
+          class="fas fa-home"
+          *ngIf="!jsondataService.hideLogoutBtn"
+          (click)="HomeClick()"
+        ></i>
+      </h4>
     </div>
     <div class="col-sm-3">
-      <span class="database"><b><i class='fas fa-user'></i> Database Management</b></span>
-      <h4><i class='fas fa-power-off' (click)="logOut()"></i></h4>
+      <span class="database"
+        ><b><i class="fas fa-user"></i> Data Management</b></span
+      >
+      <h4>
+        <i
+          class="fas fa-power-off"
+          *ngIf="!jsondataService.hideLogoutBtn"
+          (click)="logOut()"
+        ></i>
+      </h4>
     </div>
   </div>
 </nav>

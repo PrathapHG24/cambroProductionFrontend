@@ -1,81 +1,82 @@
 .container-xl {
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;
-    padding: 0px;
-    margin-top: 2%;
-    width: 50%;
-  
-    .table-responsive {
-      margin: 30px 0;
-  
-      .table-wrapper {
-        background: #fff;
-        padding: 20px 25px;
-        border-radius: 3px;
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); // Updated shadow
-  
-        .table-title {
-          padding-bottom: 15px;
-          background: #f7f7f7; // Lighter background
-          color: #333; // Darker text
-          padding: 16px 30px;
-          min-width: 100%;
-          margin: -20px -25px 10px;
-          border-radius: 3px 3px 0 0;
-  
-          .back {
-            float: right;
-            text-transform: uppercase;
-            font-size: 13px !important;
-            color: #64437d; // Brand color for back button
-          }
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12) !important;
+  padding: 0px;
+  margin-top: 2%;
+  width: 50%;
+
+  .table-responsive {
+    margin: 30px 0;
+
+    .table-wrapper {
+      background: #fff;
+      padding: 20px 25px;
+      border-radius: 3px;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19); // Updated shadow
+
+      .table-title {
+        padding-bottom: 15px;
+        background: #64437d; // Lighter background
+        color: #ffffff; // Darker text
+        padding: 16px 30px;
+        min-width: 100%;
+        margin: -20px -25px 10px;
+        border-radius: 3px 3px 0 0;
+
+        .back {
+          float: right;
+          text-transform: uppercase;
+          font-size: 13px !important;
+          color: #ffffff; // Brand color for back button
         }
-  
-        .table-footer {
-          padding-top: 10px;
-          text-align: center;
-  
-          .btn {
-            color: #fff;
-            width: 150px; // Wider button
-            border-radius: 2px;
-            font-size: 15px !important;
-            text-transform: uppercase;
-            background-color: #64437d; // Brand color for button
-            border: none; // Remove border
-  
-            &:hover { // Add hover effect
-              background-color: #4b2e5f; // Darken on hover
-            }
-          }
-        }
-  
-        .table-content {
-          select {
-            width: 100%;
-            padding: 0.375rem 0.75rem;
-            font-size: 1rem;
-            font-weight: 400;
-            line-height: 1.5;
-            color: #212529;
-            background-color: #fff;
-            background-clip: padding-box;
-            border: 1px solid #ced4da;
-          }
-  
-          .p-10 {
-            padding: 10px;
-          }
-  
-          .p-t-b-10 {
-            padding: 10px 0px;
-          }
-  
-          .requiredStar {
-            color: red;
-            padding-left: 5px;
+      }
+
+      .table-footer {
+        padding-top: 10px;
+        text-align: center;
+
+        .btn {
+          color: #fff;
+          width: 150px; // Wider button
+          border-radius: 2px;
+          font-size: 15px !important;
+          text-transform: uppercase;
+          background-color: #198754; // Brand color for button
+          border: none; // Remove border
+
+          &:hover {
+            // Add hover effect
+            background-color: #4b2e5f; // Darken on hover
           }
         }
       }
-    }
-  }
-  
+
+      .table-content {
+        select {
+          width: 100%;
+          padding: 0.375rem 0.75rem;
+          font-size: 1rem;
+          font-weight: 400;
+          line-height: 1.5;
+          color: #212529;
+          background-color: #fff;
+          background-clip: padding-box;
+          border: 1px solid #ced4da;
+        }
+
+        .p-10 {
+          padding: 10px;
+        }
+
+        .p-t-b-10 {
+          padding: 10px 0px;
+        }
+
+        .requiredStar {
+          color: red;
+          padding-left: 5px;
+        }
+      } // Check this closing brace
+    } // Check this closing brace
+  } // Check this closing brace
+} // Check this closing brace

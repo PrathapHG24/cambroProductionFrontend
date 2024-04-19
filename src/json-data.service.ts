@@ -7,9 +7,11 @@ import { Injectable } from "@angular/core";
 export class JsonDataService {
   constructor(private http: HttpClient) {}
 
+  public hideLogoutBtn: boolean = false;
+
   getJsondata(schId: any) {
     return this.http.get<any>(
-      `https://unattendedops.cambro.corp/api/LabelData/GetLabelData/${schId}`
+      `https://unattendedops.cambro.com/api/LabelData/GetLabelData/${schId}`
     );
   }
 }
