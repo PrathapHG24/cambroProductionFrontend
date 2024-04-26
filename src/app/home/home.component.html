@@ -99,6 +99,13 @@
       <button class="btn btn-info" (click)="updateSchedulerTags()" *ngIf="!areTagsNotNull(schedulerTagsList)">Update Tags</button>
       <!-- <button class="btn btn-info" (click)="insertDataInPlc()" *ngIf="areTagsNotNull(schedulerTagsList)">Insert Data to plc</button> -->
   </div>
+
+  <div *ngIf="insertingPlcData">
+    <div id="plc-loader" class="modal">
+      <h4> <span class="fa fa-spinner fa-spin"></span>&nbsp;&nbsp; Inserting data, please wait...</h4>
+    </div>
+    <a class="backdrop"></a>
+  </div>
 </div>
 
 <div *ngIf="isUserAdmin()">

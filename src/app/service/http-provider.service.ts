@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { WebApiService } from './web-api.service';
 
-var apiUrl = '';//"http://:8080";
+var apiUrl = '';//"http://:9091";
 
 // var apiUrl = "http://192.168.10.10:105";
 
@@ -87,7 +87,7 @@ export class HttpProviderService {
   }
 
   // fetchAllScheduelIds() {
-  //   const url = `https://cambromachine:8080/mapping/getAllScheduleId`;
+  //   const url = `https://cambromachine:9091/mapping/getAllScheduleId`;
   //   return this.webApiService.get(url);
   // }
 

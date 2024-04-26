@@ -124,6 +124,7 @@ export class HomeComponent implements OnInit {
   insertDataResponse = [];
   schedulerTagsList = [];
   plcTagMapping = {};
+  insertingPlcData = false;
   constructor(
     private router: Router,
     private modalService: NgbModal,
@@ -460,6 +461,7 @@ export class HomeComponent implements OnInit {
     }
 
     insertDataInPlc() {
+      this.insertingPlcData = true;
         this.schedulerTagsList.forEach(item => {
             this.plcTagMapping[item.jsonVariable] = item.plcTag;
         });
@@ -469,6 +471,7 @@ export class HomeComponent implements OnInit {
         })
         this.httpProvider.insertDataToPlc([payload]).subscribe(
             (res: any) => {
+              this.insertingPlcData = false;
                 // this.toastr.success('Data inserted to Plc');
                 this.toastr.success(res.message);
             },

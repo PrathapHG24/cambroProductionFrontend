@@ -38,7 +38,7 @@ export class WebApiService {
       observe: "response" as "body",
     };
 
-    return this.httpClient.get("https://cambromachine:8080/" + url, httpOptions).pipe(
+    return this.httpClient.get("https://cambromachine:9091/" + url, httpOptions).pipe(
       map((response: any) => this.ReturnResponseData(response)),
       catchError(this.handleError)
     );
@@ -56,7 +56,7 @@ export class WebApiService {
       // observe: "response" as 'body'
     };
 
-    return this.httpClient.post("https://cambromachine:8080/" + url, model, httpOptions).pipe(
+    return this.httpClient.post("https://cambromachine:9091/" + url, model, httpOptions).pipe(
       map((response: any) => this.ReturnResponseData(response)),
       catchError(this.handleError)
     );
@@ -85,14 +85,14 @@ export class WebApiService {
       observe: "response" as "body",
     };
 
-    return this.httpClient.delete("https://cambromachine:8080" + url, httpOptions).pipe(
+    return this.httpClient.delete("https://cambromachine:9091" + url, httpOptions).pipe(
       map((response: any) => this.ReturnResponseData(response)),
       catchError(this.handleError)
     );
   }
 
   importJsonData(jsonInput: any): Observable<any> {
-    const url = "https://cambromachine:8080/api/identify";
+    const url = "https://cambromachine:9091/api/identify";
 
     const httpOptions = {
       headers: new HttpHeaders({

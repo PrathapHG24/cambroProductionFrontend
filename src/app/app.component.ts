@@ -16,7 +16,8 @@ export class AppComponent {
   ) {}
 
   HomeClick() {
-    this.router.navigate(["Home"]);
+    window.location.href = 'http://cambromachine:4200/';
+    //this.router.navigate(["Home"]);
   }
 
   logOut() {
