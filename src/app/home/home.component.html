@@ -7,36 +7,32 @@
       (click)="opennConnectModal(table); resetBatchStatus()"
       *ngIf="!showAddBatch"
     >
-      Open batch
+      Start batch
     </button>
   </div>
 </div>
 <div class="schedulerId" *ngIf="showAddBatch">
-    <label for="scheduler-id">Add Scheduler Id</label>
-    <input
-        type="text"
-        name=""
-        id="sceduler"
-        [(ngModel)]="schedulerId"
-        (input)="insertDataInSelectedTable()"
-    />
-    <div *ngIf="!selectedTable" class="schedule-actions">
-        <button type="button" (click)="clearSchedulerId()" >
-            Cancel
-        </button>
-        <button type="button" (click)="getSchedulerData()">
-            Ok
-        </button>
-    </div>
-    <div *ngIf="selectedTable" class="close-batch">
-        <button
-            class="btn btn-info"
-            style="margin: 1rem auto"
-            (click)="onCloseBatchConfirmation()"
-        >
-        Close Batch
-      </button>
-    </div>
+  <label for="scheduler-id">Add Scheduler Id</label>
+  <input
+    type="text"
+    name=""
+    id="sceduler"
+    [(ngModel)]="schedulerId"
+    (input)="insertDataInSelectedTable()"
+  />
+  <div *ngIf="!selectedTable" class="schedule-actions">
+    <button type="button" (click)="clearSchedulerId()">Cancel</button>
+    <button type="button" (click)="getSchedulerData()">Ok</button>
+  </div>
+  <div *ngIf="selectedTable" class="close-batch">
+    <button
+      class="btn btn-info"
+      style="margin: 1rem auto"
+      (click)="onCloseBatchConfirmation()"
+    >
+      Close Batch
+    </button>
+  </div>
 </div>
 
 <div *ngIf="matchedTables.length > 0 && showAddBatch">
@@ -77,32 +73,59 @@
     Close Batch
   </button> -->
 
-  <div style="margin:4rem 2rem;">
+  <div style="margin: 4rem 2rem" *ngIf="!params.scheduleId">
     <!-- Tag Update -->
     <strong>Tag Update:</strong>
     <table class="tag-table">
-        <tr *ngFor="let tag of schedulerTagsList">
-          <th style="padding: 0.5rem;text-align: left;">
-            {{ tag.jsonVariable }}
-          </th>
-          <td style="padding: 0.5rem;">
-            <div *ngIf="!tag.editMode">{{tag.plcTag}}</div>
-            <input type="text" placeholder="" [(ngModel)]="tag.plcTag" *ngIf="tag.editMode"/>
-          </td>
-        </tr>
-        <!-- <tr>
+      <tr *ngFor="let tag of schedulerTagsList">
+        <th style="padding: 0.5rem; text-align: left">
+          {{ tag.jsonVariable }}
+        </th>
+        <td style="padding: 0.5rem">
+          <div *ngIf="!tag.editMode">{{ tag.plcTag }}</div>
+          <input
+            type="text"
+            placeholder=""
+            [(ngModel)]="tag.plcTag"
+            *ngIf="tag.editMode"
+          />
+        </td>
+      </tr>
+      <!-- <tr>
           <td *ngFor="let item of insertDataResponse | keyvalue">
             <input type="text" placeholder="" />
           </td>
         </tr> -->
-      </table>
-      <button class="btn btn-info" (click)="updateSchedulerTags()" *ngIf="!areTagsNotNull(schedulerTagsList)">Update Tags</button>
-      <!-- <button class="btn btn-info" (click)="insertDataInPlc()" *ngIf="areTagsNotNull(schedulerTagsList)">Insert Data to plc</button> -->
+    </table>
+    <button
+      class="btn btn-info"
+      (click)="updateSchedulerTags()"
+      *ngIf="!areTagsNotNull(schedulerTagsList)"
+    >
+      Update Tags
+    </button>
+    <!-- <button class="btn btn-info" (click)="insertDataInPlc()" *ngIf="areTagsNotNull(schedulerTagsList)">Insert Data to plc</button> -->
+  </div>
+
+  <div class="open-batch">
+    <div *ngIf="!isUserAdmin()">
+      <button
+        type="button"
+        class="btn btn-success"
+        (click)="opennConnectModal(table); resetBatchStatus()"
+        *ngIf="!showAddBatch && !isBatchOpen"
+      >
+        Start batch
+      </button>
+    </div>
   </div>
 
   <div *ngIf="insertingPlcData">
     <div id="plc-loader" class="modal">
-      <h4> <span class="fa fa-spinner fa-spin"></span>&nbsp;&nbsp; Inserting data, please wait...</h4>
+      <h4>
+        <span class="fa fa-spinner fa-spin"></span>&nbsp;&nbsp; Inserting data,
+        please wait...
+      </h4>
     </div>
     <a class="backdrop"></a>
   </div>
@@ -125,6 +148,22 @@
               >
                 <i class="fas fa-plus-circle"></i><span> Add User</span>
               </button>
+              <button
+                *ngIf="isUserAdmin()"
+                class="btn btn-success"
+                (click)="viewuserEvent()"
+              >
+                <span> Cambro Audit</span>
+              </button>
+
+              <button
+                *ngIf="isUserAdmin()"
+                class="btn btn-success"
+                (click)="userManagement()"
+              >
+                <span>Mainten User</span>
+              </button>
+
               <!-- <button
                 *ngIf="isUserAdmin()"
                 class="btn btn-success"

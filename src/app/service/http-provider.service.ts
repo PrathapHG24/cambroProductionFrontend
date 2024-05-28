@@ -17,6 +17,7 @@ var httpLink = {
   updateTagUrl: apiUrl + 'api/saveJsonKeyAsvalueAndTag',
   insertDataToPlc:"http://127.0.0.1:8083/insertDataToPlc", 
   // insertDataToPlc: apiUrl + '/api/insertDataToPlc'
+  logoutRecord:'user-event/logout'
 }
 
 
@@ -113,6 +114,9 @@ export class HttpProviderService {
     return this.webApiService.postDataToPlc(httpLink.insertDataToPlc, payload);
   }
 
+  logout(): Observable<any> {
+    return this.webApiService.post(httpLink.logoutRecord,{});
+  } 
   // /api/{{selectedDatabas}}/table/create/manoj
   
   }

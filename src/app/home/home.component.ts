@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, Type } from "@angular/core";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { NgbModal, NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 import { ToastrService } from "ngx-toastr";
 import { HttpProviderService } from "../service/http-provider.service";
@@ -8,6 +8,7 @@ import { LoginService } from "../service/login.service";
 import { CUSTOM_MODALS } from "../shared/modal/custom-modal.component";
 import { HttpClient } from "@angular/common/http";
 import { JsonDataService } from "src/json-data.service";
+import { Action } from "rxjs/internal/scheduler/Action";
 
 @Component({
   selector: "ng-modal-confirm",
@@ -125,6 +126,8 @@ export class HomeComponent implements OnInit {
   schedulerTagsList = [];
   plcTagMapping = {};
   insertingPlcData = false;
+  isBatchOpen: boolean;
+  params: any = {};
   constructor(
     private router: Router,
     private modalService: NgbModal,
@@ -134,17 +137,35 @@ export class HomeComponent implements OnInit {
     private service: JsonDataService,
     private http: HttpClient,
     private loginService: LoginService,
-    private jsonService: JsonDataService
+    private jsonService: JsonDataService,
+    private route: ActivatedRoute
   ) {}
   reload() {
     this.getAlldatabase();
   }
   ngOnInit(): void {
+    this.params = { scheduleId: this.route.snapshot.queryParams["scheduleId"] };
     this.getAlldatabase();
+    this.checkBatchStatus();
     // this.service.getJsondata().subscribe((data) => {
     //   this.jsonData = data;
     //   return this.jsonData;
     // });
+  }
+
+  checkBatchStatus() {
+    let batchStatus = sessionStorage.getItem("isBatchOpen");
+    if (this.params.scheduleId) {
+      batchStatus = "true";
+      this.showAddBatch = true;
+      this.schedulerId = this.params.scheduleId;
+      this.getSchedulerData();
+    }
+    if (batchStatus === "true") {
+      this.isBatchOpen = true;
+    } else {
+      this.isBatchOpen = false;
+    }
   }
 
   async getAlldatabase() {
@@ -160,13 +181,25 @@ export class HomeComponent implements OnInit {
     });
   }
   getSchedulerData() {
-    this.jsonService.getJsondata(this.schedulerId).subscribe((data) => {
-      this.jsonService.hideLogoutBtn = true;
+    return this.jsonService.getJsondata(this.schedulerId).subscribe((data) => {
       this.importJSONDATA(data[0]);
       this.jsonData = data;
       this.objectVar = this.schedulerId;
-      return this.jsonData;
+      // Now that we have received the data, let's save the schedule ID to the backend
+      this.saveScheduleIdToBackend(this.schedulerId);
     });
+  }
+  saveScheduleIdToBackend(schedulerId: string) {
+    this.jsonService.saveSchedulerId(schedulerId).subscribe(
+      (response) => {
+        console.log('Schedule ID saved successfully:', response);
+        // Handle success response here
+      },
+      (error) => {
+        console.error('Error saving Schedule ID:', error);
+        // Handle error response here
+      }
+    );
   }
 
   getSchedulerDataAndInsert() {
@@ -199,10 +232,36 @@ export class HomeComponent implements OnInit {
       );
   }
 
+  // onCloseBatch() {
+  //   this.updateEndTime();
+  //   this.isBatchOpen = false; // Update the flag when batch is closed
+  //   sessionStorage.setItem("isBatchOpen", "false"); // Store batch status in sessionStorage
+  //   window.location.href = "https://cambromachine:4200";
+  // }
   onCloseBatch() {
     this.updateEndTime();
-    this.jsonService.hideLogoutBtn = false;
+    this.isBatchOpen = false; // Update the flag when batch is closed
+    sessionStorage.setItem("isBatchOpen", "false"); // Store batch status in sessionStorage
+  
+    const data = [{CAMBRO_BATCH_START_STOP_M1 : "STOP"}]; // Define your data here
+  
+    this.closeBatch(data); // Call closeBatch and pass the data
+  
+    // Redirect to another URL after closing the batch
+    window.location.href = "https://cambromachine:4200";
   }
+  
+  closeBatch(data: any) {
+    this.http.post<any>('http://127.0.0.1:8083/insertDataToPlc', data).subscribe(
+      (res: any) => {
+        this.toastr.success('Batch closed successfully.');
+      },
+      (error: any) => {
+        this.toastr.error('Failed to close batch.');
+      }
+    );
+  }
+  
 
   updateEndTime() {
     console.log("updateEndTime", this.selectedTable);
@@ -219,19 +278,17 @@ export class HomeComponent implements OnInit {
     });
   }
   opennConnectModal(table: any) {
-    // table = "label_data2";
-    // console.log(table);
-    // const connectModal = this.modalService.open(CUSTOM_MODALS["customModal"], {
-    //   ariaLabelledBy: "modal-basic-title",
-    // });
-    // connectModal.componentInstance.data = this.scheduleIdList;
-
-    // connectModal.result.then(
-    //   (obj) => {
-
-    //   },
-    //   (reason) => {}
-    // );
+    if (this.isBatchOpen || sessionStorage.getItem("isBatchOpen") === "true") {
+      // If batch is open, set showAddBatch to true to show the details directly
+      this.showAddBatch = true;
+      this.isBatchOpen = true;
+      sessionStorage.setItem("isBatchOpen", "true"); // Store batch status in sessionStorage
+    } else {
+      // If batch is not open, open the batch as usual
+      this.showAddBatch = true;
+      this.isBatchOpen = false;
+      sessionStorage.setItem("isBatchOpen", "false"); // Store batch status in sessionStorage
+    }
     this.showAddBatch = true;
   }
   SaveTable(table, index) {
@@ -253,6 +310,13 @@ export class HomeComponent implements OnInit {
         };
         console.log(res);
         console.log(queryParams);
+        const el = document.querySelector("#sceduler");
+        el.setAttribute("disabled", "true");
+        if (this.params.scheduleId) {
+          this.insertDataResponse = res.body[0];
+          return;
+        }
+
         this.insertData(res.body, res.body, queryParams);
       },
       (err) => {
@@ -289,8 +353,14 @@ export class HomeComponent implements OnInit {
   }
 
   insertDataInSelectedTable() {
+    console.log("this.params.scheduleId");
+    console.log("this.params.scheduleId", this.params.scheduleId);
+    if (this.params.scheduleId) {
+      return;
+    }
     if (this.selectedTable) {
       if (this.schedulerId.length === 13) {
+        console.log("insnide this");
         this.getScheduleIdData(this.selectedTable);
       }
     }
@@ -311,6 +381,14 @@ export class HomeComponent implements OnInit {
 
   addUser() {
     this.router.navigate(["adduser"]);
+  }
+
+  viewuserEvent() {
+    this.router.navigate(["viewuserEvent"]);
+  }
+
+  userManagement() {
+    this.router.navigate(["userManagement"]);
   }
 
   deletedatabaseConfirmation(database: any) {
@@ -418,64 +496,102 @@ export class HomeComponent implements OnInit {
 
   getSchedulerTags() {
     this.httpProvider.getSchedulerTags().subscribe(
-        (res: any) => {
-          this.schedulerTagsList = res.body.map(tag => {
-            if (tag.plcTag) {
-                tag['editMode'] = false;
-            } else {
-                tag['editMode'] = true;
-            }
-            return tag;
-          });
-
-          if (this.areTagsNotNull(this.schedulerTagsList)) {
-            this.insertDataInPlc();
+      (res: any) => {
+        this.schedulerTagsList = res.body.map((tag) => {
+          if (tag.plcTag) {
+            tag["editMode"] = false;
+          } else {
+            tag["editMode"] = true;
           }
-        },
-        (error: any) => {}
-      );
+          return tag;
+        });
+
+        if (this.areTagsNotNull(this.schedulerTagsList)) {
+          this.insertDataInPlc();
+        }
+      },
+      (error: any) => {}
+    );
   }
 
   updateSchedulerTags() {
-    const payload = {}
-    this.schedulerTagsList.forEach(item => {
-        payload[item.jsonVariable] = item.plcTag;
+    const payload = {};
+    this.schedulerTagsList.forEach((item) => {
+      payload[item.jsonVariable] = item.plcTag;
     });
-    console.log('updateSchedulerTags', payload)
+    console.log("updateSchedulerTags", payload);
     this.httpProvider.updateTag([payload]).subscribe(
-        (res: any) => {
-          this.toastr.success(res.data);
-          this.getSchedulerTags();
-        },
-        (error: any) => {}
-      );
+      (res: any) => {
+        this.toastr.success(res.data);
+        this.getSchedulerTags();
+      },
+      (error: any) => {}
+    );
   }
 
-    areTagsNotNull(tagsList:any[]) {
-        for (let item of tagsList) {
-            if (item['editMode']) {
-                return false; // If any value is null, return false
-            }
-        }
-        return true; // All values are not null
+  areTagsNotNull(tagsList: any[]) {
+    for (let item of tagsList) {
+      if (item["editMode"]) {
+        return false; // If any value is null, return false
+      }
     }
+    return true; // All values are not null
+  }
 
-    insertDataInPlc() {
-      this.insertingPlcData = true;
-        this.schedulerTagsList.forEach(item => {
-            this.plcTagMapping[item.jsonVariable] = item.plcTag;
-        });
-        const payload = {};
-        Object.keys(this.insertDataResponse).map(key => {
-            payload[this.plcTagMapping[key]] = this.insertDataResponse[key]
-        })
-        this.httpProvider.insertDataToPlc([payload]).subscribe(
-            (res: any) => {
-              this.insertingPlcData = false;
-                // this.toastr.success('Data inserted to Plc');
-                this.toastr.success(res.message);
-            },
-        (error: any) => {}
-        );
+//   insertDataInPlc() {
+//     this.insertingPlcData = true;
+//     this.schedulerTagsList.forEach((item) => {
+//       this.plcTagMapping[item.jsonVariable] = item.plcTag;
+//     });
+//     const payload = {};
+//     Object.keys(this.insertDataResponse).map((key) => {
+//       payload[this.plcTagMapping[key]] = this.insertDataResponse[key];
+//     });
+//     this.httpProvider.insertDataToPlc([payload]).subscribe(
+//       (res: any) => {
+//         this.insertingPlcData = false;
+//         // this.toastr.success('Data inserted to Plc');
+//         this.toastr.success(res.message);
+//       },
+//       (error: any) => {}
+//     );
+//   }
+// }
+insertDataInPlc() {
+  this.insertingPlcData = true;
+  this.schedulerTagsList.forEach((item) => {
+    this.plcTagMapping[item.jsonVariable] = item.plcTag;
+  });
+  const payload = {};
+  Object.keys(this.insertDataResponse).map((key) => {
+    payload[this.plcTagMapping[key]] = this.insertDataResponse[key];
+  });
+  this.httpProvider.insertDataToPlc([payload]).subscribe(
+    (res: any) => {
+      this.insertingPlcData = false;
+      // this.toastr.success('Data inserted to Plc');
+      this.toastr.success(res.message);
+      
+      // Call the startBatch method after successful data insertion
+      this.startBatch();
+    },
+    (error: any) => {
+      this.insertingPlcData = false;
+      this.toastr.error('Failed to insert data to PLC.');
     }
+  );
+}
+
+startBatch() {
+  const data = [{CAMBRO_BATCH_START_STOP_M1 : "START"}]; // Define your data here
+
+  this.http.post<any>('http://127.0.0.1:8083/insertDataToPlc', data).subscribe(
+    (res: any) => {
+      this.toastr.success('Batch started successfully.');
+    },
+    (error: any) => {
+      this.toastr.error('Failed to start batch.');
+    }
+  );
+}
 }

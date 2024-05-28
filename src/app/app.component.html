@@ -33,7 +33,7 @@
       <h4>
         <i
           class="fas fa-home"
-          *ngIf="!jsondataService.hideLogoutBtn"
+          *ngIf="!jsondataService.hideHomeBtn"
           (click)="HomeClick()"
         ></i>
       </h4>
@@ -45,7 +45,6 @@
       <h4>
         <i
           class="fas fa-power-off"
-          *ngIf="!jsondataService.hideLogoutBtn"
           (click)="logOut()"
         ></i>
       </h4>
