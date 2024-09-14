@@ -84,4 +84,8 @@ export class LoginComponent implements OnInit {
       }
     );
   }
+
+  focusInput(event: any) {
+    event.target.focus(); // Keeps the input field focused on touch
+  }
 }

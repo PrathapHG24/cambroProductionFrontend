@@ -34,8 +34,15 @@
               <label for="password" class="p-t-b-10"> Password<span class="requiredStar">*</span></label>
             </div>
             <div class="col-sm-9">
-              <input type="password" class="form-control" id="password" required maxlength="255"
-                pattern="^[a-zA-Z_][a-zA-Z0-9_]*$" [(ngModel)]="addUserForm.password" name="password"
+              <input 
+                type="password" 
+                class="form-control" 
+                id="password" 
+                required 
+                maxlength="255"
+                pattern="^[a-zA-Z_][a-zA-Z0-9_!@#\$%\^&\(\)]{0,254}$" 
+                [(ngModel)]="addUserForm.password" 
+                name="password"
                 #password="ngModel">
               <!-- <div *ngIf="password.errors && isSubmitted" class="alert alert-danger validationError">
                 <div *ngFor="let error of password.errors | keyvalue">
