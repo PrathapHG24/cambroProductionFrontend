@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { WebApiService } from './web-api.service';
 
 var apiUrl = '';//"http://:9091";
@@ -46,9 +46,23 @@ export class HttpProviderService {
     return this.webApiService.post(httpLink.savedatabase, model);
   }
 
-  public addUser(payload: any): Observable<any> {
-    return this.webApiService.post(httpLink.adduser, payload);
+  // public addUser(payload: any): Observable<any> {
+  //   return this.webApiService.post(httpLink.adduser, payload);
+  // }
+  public addUser(payload: any): Observable<any[]> {
+    const urls = [
+      'https://cambromachine:9091/user/',
+      'https://cambromachine:9092/user/',
+      'https://cambromachine:9093/user/',
+      'https://cambromachine:9094/user/'
+    ];
+  
+    const requests = urls.map(url => this.webApiService.addUserPost(url, payload));
+  
+    // Combine all the observables into one
+    return forkJoin(requests);
   }
+  
   public dropTableByName(model: { dbName: string; tableName: string }): Observable<any> {
     const url = `${httpLink.dropTableByName}/dbName=${model.dbName}/tableName=${model.tableName}`;
     console.log(url)
