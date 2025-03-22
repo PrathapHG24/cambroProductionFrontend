@@ -129,6 +129,16 @@
     </div>
     <a class="backdrop"></a>
   </div>
+
+  <div *ngIf="closingBatch">
+    <div id="plc-loader" class="modal">
+      <h4>
+        <span class="fa fa-spinner fa-spin"></span>&nbsp;&nbsp; Closing the Batch,
+        please wait...
+      </h4>
+    </div>
+    <a class="backdrop"></a>
+  </div>
 </div>
 
 <div *ngIf="isUserAdmin()">

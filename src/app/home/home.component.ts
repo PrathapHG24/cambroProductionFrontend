@@ -126,6 +126,7 @@ export class HomeComponent implements OnInit {
   schedulerTagsList = [];
   plcTagMapping = {};
   insertingPlcData = false;
+  closingBatch = false;
   isBatchOpen: boolean;
   params: any = {};
   constructor(
@@ -239,29 +240,74 @@ export class HomeComponent implements OnInit {
   //   window.location.href = "https://cambromachine:4200";
   // }
   onCloseBatch() {
-    this.updateEndTime();
     this.isBatchOpen = false; // Update the flag when batch is closed
     sessionStorage.setItem("isBatchOpen", "false"); // Store batch status in sessionStorage
-  
-    const data = [{CAMBRO_BATCH_START_STOP_M1 : "STOP"}]; // Define your data here
-  
+
+    const data = [{ CAMBRO_BATCH_START_STOP_M1: "STOP" }]; // Define your data here
+
     this.closeBatch(data); // Call closeBatch and pass the data
-  
-    // Redirect to another URL after closing the batch
-    window.location.href = "https://cambromachine:4200";
-  }
-  
-  closeBatch(data: any) {
+}
+
+closeBatch(data: any) {
+    this.closingBatch = true; // Set insertingPlcData to true to show the loader
+
     this.http.post<any>('http://127.0.0.1:8083/insertDataToPlc', data).subscribe(
-      (res: any) => {
-        this.toastr.success('Batch closed successfully.');
-      },
-      (error: any) => {
-        this.toastr.error('Failed to close batch.');
-      }
+        (res: any) => {
+            this.closingBatch = false; // Set insertingPlcData to false after successful insertion
+            this.updateEndTime(); // Update the end time after successful insertion
+            this.toastr.success('Batch closed successfully.');
+
+            // Redirect to another URL after closing the batch    
+            window.location.href = "https://cambromachine:4200";
+        },
+        (error: any) => {
+            this.closingBatch = false; // Set insertingPlcData to false in case of error
+            this.toastr.error('Failed to close batch.');
+            window.location.href = "https://cambromachine:4200";
+        }
     );
-  }
+}
   
+  // onCloseBatch() {
+  //   this.updateEndTime();
+  //   this.isBatchOpen = false; // Update the flag when batch is closed
+  //   sessionStorage.setItem("isBatchOpen", "false"); // Store batch status in sessionStorage
+  
+  //   const data = [{ CAMBRO_BATCH_START_STOP_M1: "STOP" }]; // Define your data here
+  
+  //   // Call closeBatch and wait for success before redirecting
+  //   this.closeBatch(data)
+  //     .then(() => {
+  //       // Wait for 2 seconds before redirecting
+  //       setTimeout(() => {
+  //         window.location.href = "https://cambromachine:4200";
+  //       }, 2000);
+  //     })
+  //     .catch(() => {
+  //       this.toastr.error('Batch close failed. Redirection stopped.');
+  //     });
+  // }
+  
+  // closeBatch(data: any): Promise<void> {
+  //   return new Promise((resolve, reject) => {
+  //     this.http.post<any>('http://127.0.0.1:8083/insertDataToPlc', data).subscribe(
+  //       (res: any) => {
+  //         // Check for a successful response based on the server's response structure
+  //         if (res && res.message === "Data written successfully.") { // Match the server's success message
+  //           this.toastr.success('Batch closed successfully.');
+  //           resolve(); // Proceed with redirection
+  //         } else {
+  //           this.toastr.error('Failed to close batch.');
+  //           reject(); // Stop redirection
+  //         }
+  //       },
+  //       (error: any) => {
+  //         this.toastr.error('Failed to close batch.');
+  //         reject(); // Stop redirection on failure
+  //       }
+  //     );
+  //   });
+  // }
 
   updateEndTime() {
     console.log("updateEndTime", this.selectedTable);
@@ -410,7 +456,7 @@ export class HomeComponent implements OnInit {
   importJSONDATA(data: any) {
     this.importingInProgress = true;
 
-    // Assuming you have a method like importJsonData in your webApiService
+    // have a method like importJsonData in your webApiService
     this.webApiService.importJsonData(data).subscribe(
       (response) => {
         console.log("Import JSON Response:", response);
@@ -451,7 +497,7 @@ export class HomeComponent implements OnInit {
   importJSON() {
     this.importingInProgress = true;
 
-    // Assuming you have a method like importJsonData in your webApiService
+    // have a method like importJsonData in your webApiService
     console.log(this.jsonData);
     this.webApiService.importJsonData(this.jsonInput).subscribe(
       (response) => {
@@ -459,7 +505,7 @@ export class HomeComponent implements OnInit {
 
         // Handle the response as needed
 
-        // Assuming the response has tableName and databaseName properties
+        // the response has tableName and databaseName properties
         if (response && response.body.tableName && response.body.databaseName) {
           console.log(
             `Identified Table: ${response.body.tableName} in Database: ${response.databaseName}`
@@ -538,38 +584,69 @@ export class HomeComponent implements OnInit {
     return true; // All values are not null
   }
 
-//   insertDataInPlc() {
-//     this.insertingPlcData = true;
-//     this.schedulerTagsList.forEach((item) => {
-//       this.plcTagMapping[item.jsonVariable] = item.plcTag;
-//     });
-//     const payload = {};
-//     Object.keys(this.insertDataResponse).map((key) => {
-//       payload[this.plcTagMapping[key]] = this.insertDataResponse[key];
-//     });
-//     this.httpProvider.insertDataToPlc([payload]).subscribe(
-//       (res: any) => {
-//         this.insertingPlcData = false;
-//         // this.toastr.success('Data inserted to Plc');
-//         this.toastr.success(res.message);
-//       },
-//       (error: any) => {}
-//     );
-//   }
+
+// insertDataInPlc() {
+//   this.insertingPlcData = true;
+//   this.schedulerTagsList.forEach((item) => {
+//     this.plcTagMapping[item.jsonVariable] = item.plcTag;
+//   });
+//   const payload = {};
+//   Object.keys(this.insertDataResponse).map((key) => {
+//     payload[this.plcTagMapping[key]] = this.insertDataResponse[key];
+//   });
+//   this.httpProvider.insertDataToPlc([payload]).subscribe(
+//     (res: any) => {
+//       this.insertingPlcData = false;
+//       // this.toastr.success('Data inserted to Plc');
+//       this.toastr.success(res.message);
+      
+//       // Call the startBatch method after successful data insertion
+//       this.startBatch();
+//     },
+//     (error: any) => {
+//       this.insertingPlcData = false;
+//       this.toastr.error('Failed to insert data to PLC.');
+//     }
+//   );
 // }
+
+// startBatch() {
+//   const data = [{CAMBRO_BATCH_START_STOP_M1 : "START"}]; // Define your data here
+
+//   this.http.post<any>('http://127.0.0.1:8083/insertDataToPlc', data).subscribe(
+//     (res: any) => {
+//       this.toastr.success('Batch started successfully.');
+//     },
+//     (error: any) => {
+//       this.toastr.error('Failed to start batch.');
+//     }
+//   );
+// }
+
 insertDataInPlc() {
   this.insertingPlcData = true;
   this.schedulerTagsList.forEach((item) => {
     this.plcTagMapping[item.jsonVariable] = item.plcTag;
   });
+
+  // Create the payload object
   const payload = {};
   Object.keys(this.insertDataResponse).map((key) => {
     payload[this.plcTagMapping[key]] = this.insertDataResponse[key];
   });
+
+  // Remove the undefined field from the payload
+  if (payload.hasOwnProperty('undefined')) {
+  delete payload['undefined'];
+  }
+
+  // Add the batch start command to the payload
+  payload['CAMBRO_BATCH_START_STOP_M1'] = "START";
+
+  // Send the payload to the PLC
   this.httpProvider.insertDataToPlc([payload]).subscribe(
     (res: any) => {
       this.insertingPlcData = false;
-      // this.toastr.success('Data inserted to Plc');
       this.toastr.success(res.message);
       
       // Call the startBatch method after successful data insertion
@@ -583,15 +660,8 @@ insertDataInPlc() {
 }
 
 startBatch() {
-  const data = [{CAMBRO_BATCH_START_STOP_M1 : "START"}]; // Define your data here
-
-  this.http.post<any>('http://127.0.0.1:8083/insertDataToPlc', data).subscribe(
-    (res: any) => {
-      this.toastr.success('Batch started successfully.');
-    },
-    (error: any) => {
-      this.toastr.error('Failed to start batch.');
-    }
-  );
+  // This method is now redundant since the batch start command is included in the payload
+  // You can remove this method or keep it for other purposes
+  this.toastr.success('Batch started successfully.');
 }
 }
